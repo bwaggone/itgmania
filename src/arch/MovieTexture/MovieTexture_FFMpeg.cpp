@@ -270,7 +270,7 @@ int MovieDecoder_FFMpeg::DecodePacketInBuffer() {
 		if (m_FrameBuffer.back().packet.size == 0 && firstFrame) {
 			return 0; /* eof */
 		}
-
+		
 		/* Hack: we need to send size = 0 to flush frames at the end, but we have
 		 * to give it a buffer to read from since it tries to read anyway. */
 		m_FrameBuffer.back().packet.data = m_FrameBuffer.back().packet.size ? m_FrameBuffer.back().packet.data : nullptr;

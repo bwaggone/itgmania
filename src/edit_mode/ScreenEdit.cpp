@@ -69,59 +69,6 @@ const float time_between_autosave= 300.0f; // 5 minutes. -Kyz
 #define SET_MOD_SCREEN THEME->GetMetric("ScreenEdit", "SetModScreen")
 #define OPTIONS_SCREEN THEME->GetMetric("ScreenEdit", "OptionsScreen")
 
-AutoScreenMessage( SM_UpdateTextInfo );
-AutoScreenMessage( SM_BackFromMainMenu );
-AutoScreenMessage( SM_BackFromAreaMenu );
-AutoScreenMessage( SM_BackFromAlterMenu );
-AutoScreenMessage( SM_BackFromArbitraryRemap );
-AutoScreenMessage( SM_BackFromStepsInformation );
-AutoScreenMessage( SM_BackFromStepsData );
-AutoScreenMessage( SM_BackFromOptions );
-AutoScreenMessage( SM_BackFromSongInformation );
-AutoScreenMessage( SM_BackFromBGChange );
-AutoScreenMessage( SM_BackFromInsertTapAttack );
-AutoScreenMessage( SM_BackFromInsertTapAttackPlayerOptions );
-AutoScreenMessage( SM_BackFromAttackAtTime );
-AutoScreenMessage( SM_BackFromInsertStepAttack );
-AutoScreenMessage( SM_BackFromAddingModToExistingAttack );
-AutoScreenMessage( SM_BackFromEditingModToExistingAttack );
-AutoScreenMessage( SM_BackFromEditingAttackStart );
-AutoScreenMessage( SM_BackFromEditingAttackLength );
-AutoScreenMessage( SM_BackFromAddingAttackToChart );
-AutoScreenMessage( SM_BackFromInsertStepAttackPlayerOptions );
-AutoScreenMessage( SM_BackFromInsertCourseAttack );
-AutoScreenMessage( SM_BackFromInsertCourseAttackPlayerOptions );
-AutoScreenMessage( SM_BackFromCourseModeMenu );
-AutoScreenMessage( SM_BackFromKeysoundTrack );
-AutoScreenMessage( SM_BackFromNewKeysound );
-AutoScreenMessage( SM_DoRevertToLastSave );
-AutoScreenMessage( SM_DoRevertFromDisk );
-AutoScreenMessage( SM_ConfirmClearArea );
-AutoScreenMessage( SM_BackFromTimingDataInformation );
-AutoScreenMessage(SM_BackFromTimingDataChangeInformation);
-AutoScreenMessage( SM_BackFromDifficultyMeterChange );
-AutoScreenMessage( SM_BackFromBeat0Change );
-AutoScreenMessage( SM_BackFromBPMChange );
-AutoScreenMessage( SM_BackFromStopChange );
-AutoScreenMessage( SM_BackFromDelayChange );
-AutoScreenMessage( SM_BackFromTickcountChange );
-AutoScreenMessage( SM_BackFromComboChange );
-AutoScreenMessage( SM_BackFromLabelChange );
-AutoScreenMessage( SM_BackFromWarpChange );
-AutoScreenMessage( SM_BackFromSpeedPercentChange );
-AutoScreenMessage( SM_BackFromSpeedWaitChange );
-AutoScreenMessage( SM_BackFromSpeedModeChange );
-AutoScreenMessage( SM_BackFromScrollChange );
-AutoScreenMessage( SM_BackFromFakeChange );
-AutoScreenMessage( SM_BackFromStepMusicChange );
-AutoScreenMessage( SM_DoEraseStepTiming );
-AutoScreenMessage( SM_DoSaveAndExit );
-AutoScreenMessage( SM_DoExit );
-AutoScreenMessage( SM_AutoSaveSuccessful );
-AutoScreenMessage( SM_SaveSuccessful );
-AutoScreenMessage( SM_SaveSuccessNoSM );
-AutoScreenMessage( SM_SaveFailed );
-
 static const char *EditStateNames[] = {
 	"Edit",
 	"Record",
