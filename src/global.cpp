@@ -31,8 +31,8 @@ void sm_crash( const char *reason )
 	/* If we're being debugged, throw a debug break so it'll suspend the process. */
 	if( IsDebuggerPresent() )
 	{
-		DebugBreak();
-		for(;;); /* don't return */
+		//DebugBreak();
+		//for(;;); /* don't return */
 	}
 #endif
 
