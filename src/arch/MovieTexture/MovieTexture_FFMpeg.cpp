@@ -388,8 +388,8 @@ int MovieDecoder_FFMpeg::DecodePacketToFrame() {
 
 		if (avcodec_return != 0)
 		{
-			LOG->Warn(
-				"Frame %i saw nonzero avcodec_receive_frame status: %i",
+			LOG->Trace(
+				"Frame %i saw nonzero avcodec_receive_frame status: %i, this is likely not fatal.",
 				static_cast<int>(packet_buffer_.size() - 1),
 				avcodec_return);
 
