@@ -528,6 +528,7 @@ static int64_t AVIORageFile_Seek(void* opaque, int64_t offset, int whence)
 RString MovieDecoder_FFMpeg::Open(RString file)
 {
 	av_format_context_ = avcodec::avformat_alloc_context();
+	av_format_context_->flags |= AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_DISCARD_CORRUPT;
 	if (!av_format_context_)
 		return "AVCodec: Couldn't allocate context";
 
