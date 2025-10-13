@@ -208,7 +208,7 @@ int MovieDecoder_FFMpeg::HandleNextPacket() {
 	// If the decoder hit the end of the file, then that means the packet
 	// buffer is complete.
 	if (!end_of_file_) {
-		// Add in a new FrameBuffer entry, and lock it immediately.
+		// Add in a new PacketBuffer entry, and lock it immediately.
 		packet_buffer_.emplace_back(std::make_unique<PacketHolder>());
 		std::unique_lock<std::mutex> lock(packet_buffer_.back()->lock);
 		int status = SendPacketToBuffer();
@@ -240,14 +240,24 @@ int MovieDecoder_FFMpeg::HandleNextPacket() {
 
 int MovieDecoder_FFMpeg::DecodeFrame()
 {
-	int status = HandleNextPacket();
-	if (status != 0) {
-		return status;
-	}
+	bool gotFrame = false;
+    int status = 0;
+    while (!gotFrame) {
+	  status = HandleNextPacket();
+	  if (status != 0) {
+	  	 return status;
+	  }
 
-	status = DecodePacketToFrame();
-	frame_buffer_position_ = (frame_buffer_position_ + 1) % frame_buffer_.size();
-	packet_buffer_position_ = (packet_buffer_position_ + 1) % total_frames_;
+	  status = DecodePacketToFrame();
+      if (status < 0) {
+          packet_buffer_.pop_back();
+      } else {
+        gotFrame = true;
+        frame_buffer_position_ =
+            (frame_buffer_position_ + 1) % frame_buffer_.size();
+        packet_buffer_position_ = (packet_buffer_position_ + 1) % total_frames_;
+      }
+    }
 	return status;
 }
 
@@ -391,15 +401,10 @@ int MovieDecoder_FFMpeg::DecodePacketToFrame() {
 		if (avcodec_return != 0)
 		{
 			LOG->Trace(
-				"Frame %i saw nonzero avcodec_receive_frame status: %i, this is likely not fatal.",
+				"Frame %i saw nonzero avcodec_receive_frame status: %i, skipping frame decoding",
 				static_cast<int>(packet_buffer_.size() - 1),
 				avcodec_return);
-
-			// Not a fatal decoding error, and the FFMpeg code is robust enough to handle displaying
-			// somewhat mangled frames.
-			if (packet_offset <= packet->packet->size) {
-				continue;
-			}
+            return -1;
 		}
 
 		if (frame->frame->pkt_dts != AV_NOPTS_VALUE)
