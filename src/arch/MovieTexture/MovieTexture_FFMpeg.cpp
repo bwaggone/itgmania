@@ -181,7 +181,7 @@ float MovieDecoder_FFMpeg::GetTimestamp() const
 	}
 
 	std::lock_guard<std::mutex> lock(packet->lock);
-	return packet->frame_timestamp;
+	return packet->frame_timestamp - frame_offset_;
 }
 
 bool MovieDecoder_FFMpeg::IsCurrentFrameReady() {
@@ -421,6 +421,10 @@ int MovieDecoder_FFMpeg::DecodePacketToFrame() {
 			else {
 				packet->frame_timestamp = 0;
 			}
+		}
+		if (packet_buffer_position_ == 0 && packet->frame_timestamp != 0) {
+			frame_offset_ = packet->frame_timestamp;
+			LOG->Trace("Movie does not start at timestamp 0, applying offset.");
 		}
 
 		// Length of this frame, only used as a fallback for getting the frame
