@@ -192,22 +192,12 @@ bool MovieDecoder_FFMpeg::EndOfMovie() {
 
 void MovieDecoder_FFMpeg::SeekToStart() {
   if (av_format_context_ && av_stream_) {
-    if (av_format_context_->pb) {
-      av_format_context_->pb->eof_reached = 0;
-      av_format_context_->pb->error = 0;
-      avcodec::avio_flush(av_format_context_->pb);
-    }
     int64_t start_pts =
-        (av_stream_->start_time != AV_NOPTS_VALUE)
-            ? av_stream_->start_time
+        (av_format_context_->start_time != AV_NOPTS_VALUE)
+            ? av_format_context_->start_time
             : 0;
-    int ret = avcodec::av_seek_frame(
-        av_format_context_, av_stream_->index, start_pts,
-        AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
-    if (ret < 0) {
-      avcodec::av_seek_frame(
-          av_format_context_, av_stream_->index, 0, AVSEEK_FLAG_BACKWARD);
-    }
+    avcodec::av_seek_frame(
+        av_format_context_, -1, start_pts, AVSEEK_FLAG_BACKWARD);
     if (av_stream_codec_) {
       avcodec::avcodec_flush_buffers(av_stream_codec_);
     }
@@ -623,22 +613,18 @@ void MovieDecoder_FFMpeg::Close() {
     av_stream_codec_ = nullptr;
   }
   if (av_format_context_) {
-    av_format_context_->pb = nullptr;
     avcodec::avformat_close_input(&av_format_context_);
     av_format_context_ = nullptr;
   }
   if (av_io_context_ != nullptr) {
-    RageFile* file = static_cast<RageFile*>(av_io_context_->opaque);
-    if (file != nullptr) {
-      file->Close();
-      delete file;
-    }
-    avcodec::avio_context_free(&av_io_context_);
+    RageFile* file = (RageFile*)av_io_context_->opaque;
+    file->Close();
+    delete file;
+    avcodec::av_free(av_io_context_);
     av_io_context_ = nullptr;
-    av_buffer_ = nullptr;
   }
   if (av_buffer_ != nullptr) {
-    avcodec::av_freep(&av_buffer_);
+    avcodec::av_free(av_buffer_);
     av_buffer_ = nullptr;
   }
   av_stream_ = nullptr;

@@ -326,20 +326,14 @@ void MovieTexture_Generic::UpdateMovie(float seconds) {
   if (finished_) {
     if (loop_) {
       finished_ = false;
-      first_frame_displayed_ = false;
-      clock_ = 0.0f;
+          clock_ = 0.0f;
       decoder_->Rewind();
     } else {
       return;
     }
   }
 
-  // If the video looped and the next frame timestamp has wrapped around, sync clock_
-  if (loop_ && decoder_->IsCurrentFrameReady() && decoder_->GetTimestamp() < clock_ - 0.5f) {
-    clock_ = decoder_->GetTimestamp();
-  }
-
-  if (decoder_->IsCurrentFrameReady() && (!first_frame_displayed_ || CheckFrameTime() <= 0)) {
+  if (decoder_->IsCurrentFrameReady() && CheckFrameTime() <= 0) {
     UpdateFrame();
   }
 }
@@ -352,14 +346,9 @@ void MovieTexture_Generic::UpdateFrame() {
   /* Just in case we were invalidated: */
   CreateTexture();
 
-  // If the video looped and the next frame timestamp has wrapped around, sync clock_
-  if (loop_ && decoder_->IsCurrentFrameReady() && decoder_->GetTimestamp() < clock_ - 0.5f) {
-    clock_ = decoder_->GetTimestamp();
-  }
-
   // If the engine clock has significantly outpaced decoding (e.g. gameplay hitch),
   // skip stale frames without uploading to GPU to maintain audio sync.
-  while (decoder_->IsCurrentFrameReady() && first_frame_displayed_ && CheckFrameTime() < -0.1f) {
+  while (decoder_->IsCurrentFrameReady() && CheckFrameTime() < -0.1f) {
     int drop_ret = decoder_->GetFrame(nullptr);
     if (drop_ret == 1 || decoder_->EndOfMovie()) {
       if (loop_) {
@@ -401,8 +390,6 @@ void MovieTexture_Generic::UpdateFrame() {
     }
     return;
   }
-
-  first_frame_displayed_ = true;
 
   if (texture_lock_ != nullptr) {
     texture_lock_->Unlock(surface_, true);
@@ -455,7 +442,6 @@ void MovieTexture_Generic::SetPosition(float seconds) {
 
   LOG->Trace("Seek to %f", seconds);
   clock_ = 0;
-  first_frame_displayed_ = false;
   decoder_->Rewind();
 }
 

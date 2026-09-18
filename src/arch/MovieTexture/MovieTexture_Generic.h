@@ -105,12 +105,7 @@ class MovieTexture_Generic : public RageMovieTexture {
   // be displayed 5.9 seconds into the movie).
   virtual void UpdateMovie(float seconds);
   virtual void SetPlaybackRate(float rate) { rate_ = rate; }
-  void SetLooping(bool looping = true) override {
-    loop_ = looping;
-    if (decoder_) {
-      decoder_->SetLooping(looping);
-    }
-  }
+  void SetLooping(bool looping = true) { loop_ = looping; }
   uintptr_t GetTexHandle() const;
 
   static EffectMode GetEffectMode(MovieDecoderPixelFormatYCbCr fmt);
@@ -123,8 +118,6 @@ class MovieTexture_Generic : public RageMovieTexture {
   float rate_;
   bool loop_;
   bool finished_ = false;
-  bool first_frame_displayed_ = false;
-
   // If true, halts all decoding and display.
   bool failure_ = false;
 
