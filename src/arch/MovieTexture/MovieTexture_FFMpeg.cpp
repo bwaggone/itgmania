@@ -269,6 +269,7 @@ float MovieDecoder_FFMpeg::CalculateDuration(avcodec::AVFrame* frame) {
   return duration;
 }
 
+// ConvertFrame performs sws_scale colorspace conversion and scaling on the worker thread.
 void MovieDecoder_FFMpeg::ConvertFrame(
     avcodec::AVFrame* raw_frame, ConvertedFrame& out_frame) {
   int dst_width = GetWidth();
