@@ -623,18 +623,22 @@ void MovieDecoder_FFMpeg::Close() {
     av_stream_codec_ = nullptr;
   }
   if (av_format_context_) {
+    av_format_context_->pb = nullptr;
     avcodec::avformat_close_input(&av_format_context_);
     av_format_context_ = nullptr;
   }
   if (av_io_context_ != nullptr) {
-    RageFile* file = (RageFile*)av_io_context_->opaque;
-    file->Close();
-    delete file;
-    avcodec::av_free(av_io_context_);
+    RageFile* file = static_cast<RageFile*>(av_io_context_->opaque);
+    if (file != nullptr) {
+      file->Close();
+      delete file;
+    }
+    avcodec::avio_context_free(&av_io_context_);
     av_io_context_ = nullptr;
+    av_buffer_ = nullptr;
   }
   if (av_buffer_ != nullptr) {
-    avcodec::av_free(av_buffer_);
+    avcodec::av_freep(&av_buffer_);
     av_buffer_ = nullptr;
   }
   av_stream_ = nullptr;
