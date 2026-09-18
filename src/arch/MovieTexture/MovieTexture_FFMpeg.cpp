@@ -192,12 +192,22 @@ bool MovieDecoder_FFMpeg::EndOfMovie() {
 
 void MovieDecoder_FFMpeg::SeekToStart() {
   if (av_format_context_ && av_stream_) {
+    if (av_format_context_->pb) {
+      av_format_context_->pb->eof_reached = 0;
+      av_format_context_->pb->error = 0;
+      avcodec::avio_flush(av_format_context_->pb);
+    }
     int64_t start_pts =
-        (av_format_context_->start_time != AV_NOPTS_VALUE)
-            ? av_format_context_->start_time
+        (av_stream_->start_time != AV_NOPTS_VALUE)
+            ? av_stream_->start_time
             : 0;
-    avcodec::av_seek_frame(
-        av_format_context_, -1, start_pts, AVSEEK_FLAG_BACKWARD);
+    int ret = avcodec::av_seek_frame(
+        av_format_context_, av_stream_->index, start_pts,
+        AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    if (ret < 0) {
+      avcodec::av_seek_frame(
+          av_format_context_, av_stream_->index, 0, AVSEEK_FLAG_BACKWARD);
+    }
     if (av_stream_codec_) {
       avcodec::avcodec_flush_buffers(av_stream_codec_);
     }
@@ -269,7 +279,6 @@ float MovieDecoder_FFMpeg::CalculateDuration(avcodec::AVFrame* frame) {
   return duration;
 }
 
-// ConvertFrame performs sws_scale colorspace conversion and scaling on the worker thread.
 void MovieDecoder_FFMpeg::ConvertFrame(
     avcodec::AVFrame* raw_frame, ConvertedFrame& out_frame) {
   int dst_width = GetWidth();
