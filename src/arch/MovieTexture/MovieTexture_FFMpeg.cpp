@@ -60,6 +60,9 @@ static void FixLilEndian() {
 }
 
 static int FindCompatibleAVFormat(bool bHighColor) {
+  if (DISPLAY == nullptr) {
+    return -1;
+  }
   for (int i = 0; AVPixelFormats[i].bpp; ++i) {
     AVPixelFormat_t& fmt = AVPixelFormats[i];
     if (fmt.YUV != PixelFormatYCbCr_Invalid) {
@@ -261,6 +264,13 @@ float MovieDecoder_FFMpeg::CalculatePTS(avcodec::AVFrame* frame) {
   seconds -= timestamp_offset_;
   if (seconds < 0.0f) {
     seconds = 0.0f;
+  }
+
+  // Guarantee strictly monotonic presentation timestamps. If legacy containers
+  // (e.g. AVI files with B-frames) report backward timestamp anomalies, advance
+  // smoothly using frame duration.
+  if (first_pts_seen_ && seconds < last_pts_) {
+    seconds = last_pts_ + last_duration_;
   }
 
   last_pts_ = seconds;

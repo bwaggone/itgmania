@@ -532,6 +532,8 @@ endif()
 
 target_include_directories("${SM_EXE_NAME}" PUBLIC ${SM_INCLUDE_DIRS})
 
+include("CMakeProject-test-movie.cmake")
+
 if(WIN32)
   set(SM_INSTALL_DESTINATION ".")
 elseif(APPLE)

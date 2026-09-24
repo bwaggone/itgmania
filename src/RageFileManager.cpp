@@ -440,7 +440,7 @@ RageFileManager::RageFileManager(const std::string& argv0) {
   RageFileManager::Mount("mem", "(cache)", "/@mem");
 
   // Register with Lua.
-  {
+  if (LUA != nullptr) {
     Lua* L = LUA->Get();
     lua_pushstring(L, "FILEMAN");
     this->PushSelf(L);
@@ -459,7 +459,9 @@ void RageFileManager::MountUserFilesystems() {
 
 RageFileManager::~RageFileManager() {
   // Unregister with Lua.
-  LUA->UnsetGlobal("FILEMAN");
+  if (LUA != nullptr) {
+    LUA->UnsetGlobal("FILEMAN");
+  }
 
   /* Note that drivers can use previously-loaded drivers, eg. to load a ZIP
    * from the FS.  Unload drivers in reverse order. */
